@@ -1,0 +1,12 @@
+# Compiled binaries
+cosmos_airlines
+*.exe
+*.out
+*.o
+
+# Ticket files
+Tickets.txt
+
+# Temporary files
+*.tmp
+*~
