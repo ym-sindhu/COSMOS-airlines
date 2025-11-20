@@ -37,7 +37,9 @@ void iflights();
 void packages();
 void bye();
 int generateRandomID() ;
-string currentTime(); 
+string currentTime();
+int getValidatedInt(const string& prompt, int minVal, int maxVal);
+void clearInputBuffer();
 
 int main()
 {
@@ -74,7 +76,7 @@ void menu()
     cout << "|                                                                                    |" << endl;
     cout << "|===========================================================:COSMOS AIRLINES LTD:====|" << endl;
     cout<<"\n\n\n";
-    while(!(n<1 && n>4 )){
+    while(true){
     cout << "Please select an option below: ";
     cout << "\n(1)Booking   ";
     cout << "\n(2)Packages   ";
@@ -83,16 +85,16 @@ void menu()
     if(!userNames.empty())
         cout << "\n(4)Print Tickets";
     cout << "\n(0)EXIT \n";
-    cout<< "Enter Choice: ";    
-    cin >> n;
+    
+    int maxOption = userNames.empty() ? 3 : 4;
+    n = getValidatedInt("Enter Choice: ", 0, maxOption);
+    
     switch (n)
     {
     case 1:
     // Domestic or Internaltional Flights 
         cout << "Press (1) for DOMESTIC FLIGHTS\nPress (2) for INTERNATIONAL FLIGHTS\n";
-        while(!(f1 == 1 || f1==2)){
-            cout<<"Enter Choice: ";
-            cin >> f1;
+        f1 = getValidatedInt("Enter Choice: ", 1, 2);
         switch (f1)
         {
         case 1:
@@ -101,9 +103,6 @@ void menu()
         case 2:
             iflights();
             break;
-        default:
-            cout<<"!!! INVALLID INPUT !!!\n";
-        }
         }
         userInput();
         break;
@@ -236,8 +235,7 @@ void dflights()
         << "                  Flight ID:"<<randomID<<"\n"
         << "--------------------------------------\n\n\n";      
 
-    cout << "Choose Flight : ";
-    cin >> f;
+    f = getValidatedInt("Choose Flight : ", 1, 3);
     cout << "\nYour Plane is BOEING 777\n";
     const char* asciiPlane = R"(
                       ___
@@ -265,8 +263,7 @@ void dflights()
 
     cout << asciiPlane << '\n';
 
-    cout << "Press (1) to proceed\nPress (2) to exit\n";
-    cin >> c;
+    c = getValidatedInt("Press (1) to proceed\nPress (2) to exit\n", 1, 2);
     if (c == 1)
     {
         userInput();
@@ -379,12 +376,7 @@ void iflights()
         << "                  Flight ID:"<<randomID<<"\n"
         << "--------------------------------------\n\n\n"; 
 
-    cout << "Choose Flight : ";
-    cin >> f;
-    system("cls");
-
-    cout << "Choose Flight : ";
-    cin >> f;
+    f = getValidatedInt("Choose Flight : ", 1, 3);
     system("cls");
     cout << "Your Plane is BOEING 777\n";
     const char* asciiArt = R"(
@@ -414,8 +406,7 @@ void iflights()
     cout << asciiArt << '\n';
 
 
-    cout << "Press (1) to proceed\nPress (2) to exit\n";
-    cin >> c;
+    c = getValidatedInt("Press (1) to proceed\nPress (2) to exit\n", 1, 2);
     if (c == 2)
     {
         bye();
@@ -426,18 +417,17 @@ void userInput()
 {   
     system("cls");
     
-    cout << "Enter number of seats: ";
-    cin >> seat;
-    cin.ignore();
+    seat = getValidatedInt("Enter number of seats: ", 1, 80);
 
     if (p == 2 && seat != 5)
     {
-        cout << "ONLY 5 SEATS ALLOWED IN FAMILY PACKAGE";
-       
+        cout << "ONLY 5 SEATS ALLOWED IN FAMILY PACKAGE\n";
+        seat = 5;
     }
     if (p == 3 && seat != 2)
     {
-        cout << "ONLY 2 SEATS ALLOWED IN HONEYMOON PACKAGE";
+        cout << "ONLY 2 SEATS ALLOWED IN HONEYMOON PACKAGE\n";
+        seat = 2;
     }   
     
     system("cls");
@@ -449,32 +439,30 @@ void userInput()
         getline(cin, name);
         userNames.push_back(name);
 
-        int x;
-        cout << "Enter age of passenger #" << i << ": ";
-        cin >> x;
-        cin.ignore();
+        int x = getValidatedInt("Enter age of passenger #" + to_string(i) + ": ", 1, 150);
         age.push_back(x);
 
         char g;
-        cout << "Enter gender of passenger #" << i << " (m/f): ";
-        cin >> g;
-        cin.ignore();
+        while (true) {
+            cout << "Enter gender of passenger #" << i << " (m/f): ";
+            cin >> g;
+            clearInputBuffer();
+            g = tolower(g);
+            if (g == 'm' || g == 'f') {
+                break;
+            }
+            cout << "Invalid gender! Please enter 'm' or 'f'.\n";
+        }
         gender.push_back(g);
 
         system("cls");
 
-        int c;
-        cout << "Choose ticket type:\n(1) for Economy class\n(2) for Business class\n";
-        cin >> c;
-        cin.ignore();
+        int c = getValidatedInt("Choose ticket type:\n(1) for Economy class\n(2) for Business class\n", 1, 2);
 
         if (c == 1)
         {
             economyclass();
-            cout << "Enter Seat Number: ";
-            int r;
-            cin >> r;
-            cin.ignore();
+            int r = getValidatedInt("Enter Seat Number: ", 1, 80);
             seatN.push_back(r);
             if (r > 0 && r < 81)
             {
@@ -495,14 +483,11 @@ void userInput()
         else if (c == 2)
         {
             bznsClass();
-            cout << "Enter Seat Number: ";
-            int r;
-            cin >> r;
-            cin.ignore();
+            int r = getValidatedInt("Enter Seat Number: ", 1, 40);
             seatN.push_back(r);
-            if (r > 0 && r < 81)
+            if (r > 0 && r < 41)
             {
-                for (int j = 0; j < 81; j++)
+                for (int j = 0; j < 41; j++)
                 {
                     if (bseats[j] == r)
                     {
@@ -516,14 +501,9 @@ void userInput()
                 menu();
             }
         }
-        else
-        {
-            goto endLoops;
-        }
     }
     
 
-endLoops:
     system("cls");
 
     cout << "PLEASE RECHECK DETAILS:\n";
@@ -538,8 +518,7 @@ endLoops:
             cout << "Seat # : " << seatN[i] << "\n\n";
         }
     }
-    cout << "Enter 1 to continue\nEnter 2 to exit\n";
-    cin >> pp;
+    pp = getValidatedInt("Enter 1 to continue\nEnter 2 to exit\n", 1, 2);
 
     if (pp == 1)
     {
@@ -648,11 +627,7 @@ void packages()
     cout << "|                                                               FLY-COSMOS |\n";
     cout << "|--------------------------------------------------------------------------|\n\n";
     
-    while(!(p>=1 && p<=3))    
-    {
-    cout << "Enter Package: ";
-    cin >> p;
-    cin.ignore();
+    p = getValidatedInt("Enter Package: ", 1, 3);
 
     switch (p)
     {
@@ -668,10 +643,7 @@ void packages()
         destination = "Bali (Honeymoon Package)";
         departure = "Islamabad";
         break;
-    default:
-        cout<<" !!!   INVALID INPUT   !!! \n";
     }
-    } 
 }
 
 void tickets()
@@ -700,9 +672,7 @@ void tickets()
 
             cout << "Do you want to edit any information?\n";
             cout << "1. Yes\n2. No\n";
-            int choice;
-            cin >> choice;
-            cin.ignore();
+            int choice = getValidatedInt("", 1, 2);
 
             if (choice == 2)
             {
@@ -710,16 +680,7 @@ void tickets()
             }
             else if (choice == 1)
             {
-                cout << "Enter the passenger number to edit (1 to " << userNames.size() << "): ";
-                int passengerNum;
-                cin >> passengerNum;
-                cin.ignore();
-
-                if (passengerNum < 1 || passengerNum > userNames.size())
-                {
-                    cout << "Invalid passenger number!\n";
-                    continue;
-                }
+                int passengerNum = getValidatedInt("Enter the passenger number to edit (1 to " + to_string(userNames.size()) + "): ", 1, userNames.size());
 
                 int index = passengerNum - 1;
 
@@ -728,23 +689,24 @@ void tickets()
                 cout << "Enter new name (current: " << userNames[index] << "): ";
                 getline(cin, userNames[index]);
 
-                cout << "Enter new age (current: " << age[index] << "): ";
-                cin >> age[index];
-                cin.ignore();
+                age[index] = getValidatedInt("Enter new age (current: " + to_string(age[index]) + "): ", 1, 150);
 
-                cout << "Enter new gender (current: " << gender[index] << ") (m/f): ";
-                cin >> gender[index];
-                cin.ignore();
+                char g;
+                while (true) {
+                    cout << "Enter new gender (current: " << gender[index] << ") (m/f): ";
+                    cin >> g;
+                    clearInputBuffer();
+                    g = tolower(g);
+                    if (g == 'm' || g == 'f') {
+                        gender[index] = g;
+                        break;
+                    }
+                    cout << "Invalid gender! Please enter 'm' or 'f'.\n";
+                }
 
-                cout << "Enter new seat number (current: " << seatN[index] << "): ";
-                cin >> seatN[index];
-                cin.ignore();
+                seatN[index] = getValidatedInt("Enter new seat number (current: " + to_string(seatN[index]) + "): ", 1, 80);
 
                 cout << "Information updated successfully!\n\n";
-            }
-            else
-            {
-                cout << "Invalid choice!\n";
             }
         }
 
@@ -783,8 +745,7 @@ void tickets()
         cout << "Your Tickets have been printed!\n";
     }
 
-    cout << "Enter 1 to continue\nEnter 2 to exit\n";
-    cin >> pp;
+    pp = getValidatedInt("Enter 1 to continue\nEnter 2 to exit\n", 1, 2);
 
     if (pp == 1)
     {
@@ -837,19 +798,11 @@ void routes()
     cout << setw(45) << setfill('=') << "" << endl;
     
     
-    cout << "\n\tSelect Flight Number: ";
-    cin >> c2;
+    c2 = getValidatedInt("\n\tSelect Flight Number: ", 1, idestination.size());
     
-    if (c2>=1 && c2<idestination.size())
-    {
-        destination = idestination[c2 - 1];
-        departure = ideparture[c2 - 1];
-    }
-    else
-    {
-        cout << "\n\tERROR INVALID INPUT";
-        exit(0);
-    }
+    destination = idestination[c2 - 1];
+    departure = ideparture[c2 - 1];
+    
     userInput();
 
 }
@@ -865,4 +818,29 @@ string currentTime() {
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
 
     return string(buffer); // Return formatted time as a string
+}
+
+// Helper function to clear input buffer
+void clearInputBuffer() {
+    cin.clear();
+    cin.ignore(10000, '\n');
+}
+
+// Helper function to get validated integer input within a range
+int getValidatedInt(const string& prompt, int minVal, int maxVal) {
+    int value;
+    while (true) {
+        cout << prompt;
+        if (cin >> value) {
+            if (value >= minVal && value <= maxVal) {
+                clearInputBuffer();
+                return value;
+            } else {
+                cout << "Invalid input! Please enter a number between " << minVal << " and " << maxVal << ".\n";
+            }
+        } else {
+            cout << "Invalid input! Please enter a valid number.\n";
+            clearInputBuffer();
+        }
+    }
 }
